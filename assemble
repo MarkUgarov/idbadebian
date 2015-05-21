@@ -8,6 +8,7 @@ set -o nounset
 
 INPUT=/bbx/input/biobox.yaml
 OUTPUT=/bbx/output
+METADATA=/bbx/metadata
 
 # Since this script is the entrypoint to your container
 # you can access the task in `docker run task` as the first argument
@@ -43,6 +44,11 @@ if [[ -z ${CMD} ]]; then
   exit 1
 fi
 
+# if /bbx/metadata is mounted create log.txt
+if [ -d "$METADATA" ]; then
+  CMD="($CMD) >& $METADATA/log.txt"
+fi
+
 # Run the given task with eval.
 # Eval evaluates a String as if you would use it on a command line.
 eval ${CMD}
@@ -54,8 +60,7 @@ cat << EOF > ${OUTPUT}/biobox.yaml
 version: 0.9.0
 arguments:
   - fasta:
-    - id: velvet_contigs_1
-      value: contigs.fa
+    - id: contigs1
+      value: contig.fa
       type: contigs
 EOF
-
